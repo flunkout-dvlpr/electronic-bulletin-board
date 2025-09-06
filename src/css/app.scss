@@ -1,0 +1,64 @@
+// app global css in SCSS form
+@import './theme.scss';
+
+.agenda-card {
+  transition: transform 0.2s ease-in-out;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px var(--shadow);
+    border-color: var(--primary);
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Utility classes
+.text-center {
+  text-align: center;
+}
+
+.full-width {
+  width: 100%;
+}
+
+// Responsive helpers
+@media (max-width: 600px) {
+  .mobile-hide {
+    display: none !important;
+  }
+}
+
+// Custom colors for status badges
+.status-published {
+  background-color: var(--positive);
+  color: white;
+}
+
+.status-pending {
+  background-color: var(--warning);
+  color: white;
+}
+
+.status-archived {
+  background-color: var(--text-disabled);
+  color: white;
+}
+
+.status-rejected {
+  background-color: var(--negative);
+  color: white;
+}

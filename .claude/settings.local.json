@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wmic memorychip get:*)",
+      "Bash(wmic:*)",
+      "Bash(systeminfo)",
+      "Bash(powercfg:*)",
+      "Bash(fsutil fsinfo:*)",
+      "Bash(dir)",
+      "Bash(npm:*)",
+      "Bash(node:*)",
+      "Bash(quasar create:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

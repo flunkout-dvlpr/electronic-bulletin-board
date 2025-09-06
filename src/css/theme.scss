@@ -1,0 +1,167 @@
+/* Theme Color Variables */
+:root {
+  /* Primary Colors */
+  --coyote: #795830;
+  --copper: #B5792D;
+  --gold: #FFD328;
+  --polynesian-blue: #324D9C;
+  
+  /* Light Theme Colors */
+  --primary: var(--polynesian-blue);
+  --secondary: var(--copper);
+  --accent: var(--gold);
+  --dark: var(--coyote);
+  --positive: #21BA45;
+  --negative: #C10015;
+  --info: var(--polynesian-blue);
+  --warning: var(--copper);
+  
+  /* Light Theme Background & Text */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F5F5;
+  --bg-tertiary: #EEEEEE;
+  --text-primary: #212121;
+  --text-secondary: #757575;
+  --text-disabled: #BDBDBD;
+  --border-color: #E0E0E0;
+  --shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Theme Colors */
+body.body--dark, .body--dark {
+  /* Dark Theme Background & Text */
+  --bg-primary: #121212;
+  --bg-secondary: #1E1E1E;
+  --bg-tertiary: #2D2D2D;
+  --text-primary: #FFFFFF;
+  --text-secondary: #CCCCCC;
+  --text-disabled: #777777;
+  --border-color: #3D3D3D;
+  --shadow: rgba(0, 0, 0, 0.3);
+  
+  /* Adjusted colors for dark theme */
+  --gold: #FFEB3B; /* Brighter gold for better contrast */
+  --copper: #D4941F; /* Lighter copper for better readability */
+}
+
+/* Global Dark Mode Styles */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.q-layout {
+  background-color: var(--bg-primary);
+}
+
+.q-page {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.q-header {
+  background-color: var(--primary) !important;
+}
+
+.q-card {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.q-input {
+  .q-field__control {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+  
+  .q-field__native {
+    color: var(--text-primary);
+  }
+  
+  .q-field__label {
+    color: var(--text-secondary);
+  }
+}
+
+.q-btn {
+  &.q-btn--standard {
+    background-color: var(--primary);
+    color: white;
+  }
+  
+  &.q-btn--outline {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+}
+
+.q-table {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  
+  th {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+  
+  td {
+    border-color: var(--border-color);
+  }
+}
+
+.q-dialog .q-card {
+  background-color: var(--bg-secondary);
+}
+
+.q-menu {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+}
+
+/* Custom component styles */
+.gradient-bg {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+.text-gradient {
+  background: linear-gradient(45deg, var(--gold), var(--copper));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Bulletin board specific styles */
+.bulletin-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 4px 16px var(--shadow);
+    border-color: var(--primary);
+  }
+}
+
+.agenda-preview {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+/* PDF preview styles */
+.pdf-canvas {
+  border-color: var(--border-color);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.pdf-controls {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.cycle-indicator {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+}
