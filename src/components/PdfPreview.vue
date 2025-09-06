@@ -13,9 +13,14 @@
       </div>
     </div>
     
-    <div v-else-if="pdfDoc" class="pdf-slideshow">
+    <div v-else-if="pageImages.length > 0" class="pdf-slideshow">
       <div class="pdf-canvas-container flex flex-center">
-        <canvas ref="canvas" class="pdf-canvas shadow-md rounded"></canvas>
+        <img 
+          :src="pageImages[pageNum - 1]" 
+          :alt="`Page ${pageNum}`"
+          class="pdf-canvas shadow-md rounded"
+          @error="onImageError"
+        />
       </div>
 
       <!-- Page Controls (hidden in display mode) -->
@@ -95,7 +100,7 @@ export default defineComponent({
     },
     cycleSpeed: {
       type: Number,
-      default: 5000 // 5 seconds per page
+      default: 5000
     }
   },
   
@@ -103,86 +108,82 @@ export default defineComponent({
     const loading = ref(true)
     const error = ref(false)
     const errorMessage = ref('')
-    const pdfDoc = ref(null)
+    const pageImages = ref([])
     const pageNum = ref(1)
     const numPages = ref(0)
-    const canvas = ref(null)
     const timer = ref(null)
     const cycleProgress = ref(0)
     const progressInterval = ref(null)
     
-    const loadPdf = async () => {
+    const loadPdfAsImages = async () => {
       loading.value = true
       error.value = false
       errorMessage.value = ''
+      pageImages.value = []
+      pageNum.value = 1
       
       try {
-        console.log('Loading PDF:', props.pdfUrl)
+        console.log('Loading PDF for image conversion:', props.pdfUrl)
+        
         const loadingTask = pdfjsLib.getDocument({
           url: props.pdfUrl,
           disableAutoFetch: false,
           disableStream: false
         })
         
-        pdfDoc.value = await loadingTask.promise
-        numPages.value = pdfDoc.value.numPages
-        console.log(`✅ PDF loaded successfully: ${numPages.value} pages`)
+        const pdfDoc = await loadingTask.promise
+        console.log(`✅ PDF loaded: ${pdfDoc.numPages} pages`)
         
+        // Convert each page to image
+        const images = []
+        for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+          const pageImage = await renderPageToImage(pdfDoc, pageNum)
+          images.push(pageImage)
+        }
+        
+        pageImages.value = images
+        numPages.value = images.length
         loading.value = false
         
-        // Render first page
-        await renderPage(pageNum.value)
+        console.log(`✅ Converted ${images.length} PDF pages to images`)
         
         // Start auto-cycling if enabled
-        if (props.autoPlay || props.displayMode) {
+        if ((props.autoPlay || props.displayMode) && images.length > 1) {
           startAutoCycle()
         }
+        
       } catch (err) {
         console.error('❌ Failed to load PDF:', err)
         error.value = true
-        errorMessage.value = err.message || 'Unknown error'
+        errorMessage.value = err.message || 'Failed to load PDF'
         loading.value = false
       }
     }
     
-    const renderPage = async (num) => {
-      if (!pdfDoc.value || !canvas.value) return
+    const renderPageToImage = async (pdfDoc, pageNum) => {
+      const page = await pdfDoc.getPage(pageNum)
       
-      try {
-        console.log(`🖼️ Rendering page ${num}`)
-        const page = await pdfDoc.value.getPage(num)
-        const viewport = page.getViewport({ scale: 1.2 })
-        
-        const canvasEl = canvas.value
-        const context = canvasEl.getContext('2d')
-        
-        // Set canvas size
-        canvasEl.width = viewport.width
-        canvasEl.height = viewport.height
-        
-        const renderContext = {
-          canvasContext: context,
-          viewport: viewport
-        }
-        
-        await page.render(renderContext).promise
-        console.log(`✅ Page ${num} rendered successfully`)
-      } catch (err) {
-        console.error(`❌ Error rendering page ${num}:`, err)
-        // Don't throw, just log the error
+      // Set scale for good quality but reasonable file size
+      const scale = 2.0
+      const viewport = page.getViewport({ scale })
+      
+      // Create canvas
+      const canvas = document.createElement('canvas')
+      const context = canvas.getContext('2d')
+      
+      canvas.width = viewport.width
+      canvas.height = viewport.height
+      
+      // Render page to canvas
+      const renderContext = {
+        canvasContext: context,
+        viewport: viewport
       }
-    }
-    
-    const nextPage = async () => {
-      if (!pdfDoc.value) return
-      pageNum.value = pageNum.value >= numPages.value ? 1 : pageNum.value + 1
-      await renderPage(pageNum.value)
-    }
-    
-    const prevPage = async () => {
-      if (!pdfDoc.value) return
-      pageNum.value = pageNum.value <= 1 ? numPages.value : pageNum.value - 1
-      await renderPage(pageNum.value)
+      
+      await page.render(renderContext).promise
+      
+      // Convert canvas to data URL (image)
+      return canvas.toDataURL('image/png', 0.9)
     }
     
     const startAutoCycle = () => {
@@ -217,6 +218,26 @@ export default defineComponent({
       cycleProgress.value = 0
     }
     
+    const nextPage = () => {
+      if (pageNum.value >= numPages.value) {
+        pageNum.value = 1
+      } else {
+        pageNum.value++
+      }
+    }
+    
+    const prevPage = () => {
+      if (pageNum.value <= 1) {
+        pageNum.value = numPages.value
+      } else {
+        pageNum.value--
+      }
+    }
+    
+    const onImageError = () => {
+      console.error('❌ Failed to load page image')
+    }
+    
     const openPdfExternal = () => {
       if (props.pdfUrl) {
         window.open(props.pdfUrl, '_blank')
@@ -236,13 +257,13 @@ export default defineComponent({
     watch(() => props.pdfUrl, () => {
       if (props.pdfUrl) {
         pageNum.value = 1
-        loadPdf()
+        loadPdfAsImages()
       }
     })
     
     onMounted(() => {
       if (props.pdfUrl) {
-        loadPdf()
+        loadPdfAsImages()
       }
     })
     
@@ -254,10 +275,9 @@ export default defineComponent({
       loading,
       error,
       errorMessage,
-      pdfDoc,
+      pageImages,
       pageNum,
       numPages,
-      canvas,
       cycleProgress,
       nextPage,
       prevPage,
