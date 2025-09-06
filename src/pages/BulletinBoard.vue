@@ -440,14 +440,8 @@ export default defineComponent({
       if (displayMode.value) {
         // Enable PDF previews automatically in display mode
         showPdfPreviews.value = true;
-        // Hide cursor and make fullscreen-like
-        document.body.style.cursor = "none";
-        document.body.style.overflow = "hidden";
-      } else {
-        // Restore normal cursor and scrolling
-        document.body.style.cursor = "auto";
-        document.body.style.overflow = "auto";
       }
+      // Note: No body style changes needed - keep normal cursor and scrolling
     };
 
     const applyFilters = () => {
@@ -503,9 +497,7 @@ export default defineComponent({
         clearInterval(refreshInterval.value);
       }
 
-      // Restore body styles
-      document.body.style.cursor = "auto";
-      document.body.style.overflow = "auto";
+      // Cleanup: No body style changes to restore
     });
 
     return {
