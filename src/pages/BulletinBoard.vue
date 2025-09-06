@@ -49,6 +49,7 @@
           v-model="selectedDepartment"
           :options="departments"
           placeholder="Department"
+          label="Department"
           outlined
           clearable
         />
