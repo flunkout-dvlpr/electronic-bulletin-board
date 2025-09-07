@@ -52,6 +52,7 @@
           :value="cycleProgress" 
           color="primary" 
           size="2px"
+          instant-feedback
         />
         <div class="text-caption text-center q-mt-xs">
           Page {{ pageNum }} of {{ numPages }}
@@ -111,6 +112,7 @@ export default defineComponent({
     const pageImages = ref([])
     const pageNum = ref(1)
     const numPages = ref(0)
+    const canvas = ref(null)
     const timer = ref(null)
     const cycleProgress = ref(0)
     const progressInterval = ref(null)
@@ -188,29 +190,23 @@ export default defineComponent({
     
     const startAutoCycle = () => {
       if (numPages.value <= 1) return
-      
-      stopAutoCycle()
+      if (progressInterval.value) return // already running
       
       let progress = 0
       const progressStep = 100 / (props.cycleSpeed / 100)
       
       progressInterval.value = setInterval(() => {
         progress += progressStep
-        cycleProgress.value = progress / 100
+        cycleProgress.value = (progress % 100) / 100
         
         if (progress >= 100) {
           progress = 0
-          cycleProgress.value = 0
           nextPage()
         }
       }, 100)
     }
     
     const stopAutoCycle = () => {
-      if (timer.value) {
-        clearInterval(timer.value)
-        timer.value = null
-      }
       if (progressInterval.value) {
         clearInterval(progressInterval.value)
         progressInterval.value = null
